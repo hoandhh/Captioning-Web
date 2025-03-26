@@ -8,8 +8,6 @@ from models.image import Image
 from models.report import Report
 from functools import wraps
 
-admin_controller = Blueprint('admin_controller', __name__)
-
 def admin_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):

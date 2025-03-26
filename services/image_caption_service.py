@@ -38,7 +38,7 @@ class ImageCaptionService:
                     raise FileNotFoundError(f"Không tìm thấy đường dẫn mô hình: {cls._model_path}")
                     
                 print(f"Đang tải mô hình BLIP từ {cls._model_path}...")
-                cls._processor = BlipProcessor.from_pretrained(cls._model_path)
+                cls._processor = BlipProcessor.from_pretrained(cls._model_path, use_fast=True)
                 cls._model = BlipForConditionalGeneration.from_pretrained(cls._model_path)
                 cls._model = cls._model.to(cls._device)
                 cls._model.eval()
