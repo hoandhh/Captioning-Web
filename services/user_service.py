@@ -32,7 +32,7 @@ class UserService:
         return True, ""
     
     @staticmethod
-    def create_user(username, password, email):
+    def create_user(username, password, email, full_name='', is_active=True):
         """Tạo người dùng mới với mật khẩu đã được mã hóa"""
         # Kiểm tra email hợp lệ
         is_valid_email, email_error = UserService.validate_email(email)
@@ -57,7 +57,9 @@ class UserService:
         user = User(
             username=username,
             password=hashed_password,
-            email=email.lower()  # Lưu email dưới dạng chữ thường để tránh trùng lặp
+            email=email.lower(),  # Lưu email dưới dạng chữ thường để tránh trùng lặp
+            full_name=full_name,  # Thêm full_name
+            is_active=is_active   # Thêm is_active
         )
         user.save()
         return user
@@ -67,6 +69,10 @@ class UserService:
         """Xác thực người dùng bằng tên người dùng"""
         user = User.objects(username=username).first()
         if user and check_password_hash(user.password, password):
+            # Kiểm tra trạng thái hoạt động
+            if not user.is_active:
+                return None
+                
             user.last_login = datetime.datetime.now()
             user.save()
             return user
@@ -82,6 +88,10 @@ class UserService:
         
         user = User.objects(email=email.lower()).first()
         if user and check_password_hash(user.password, password):
+            # Kiểm tra trạng thái hoạt động
+            if not user.is_active:
+                return None
+                
             user.last_login = datetime.datetime.now()
             user.save()
             return user
@@ -117,6 +127,10 @@ class UserService:
         # Tìm người dùng bằng email
         user = User.objects(email=email.lower()).first()
         if not user:
+            return False
+            
+        # Kiểm tra trạng thái hoạt động
+        if not user.is_active:
             return False
             
         # Trong triển khai thực tế:
@@ -177,3 +191,14 @@ class UserService:
             
         user.delete()
         return True
+        
+    @staticmethod
+    def toggle_user_status(user_id, is_active):
+        """Bật/tắt trạng thái hoạt động của người dùng (chỉ admin)"""
+        user = User.objects(id=user_id).first()
+        if not user:
+            raise ValueError("Không tìm thấy người dùng")
+            
+        user.is_active = is_active
+        user.save()
+        return user

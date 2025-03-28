@@ -16,7 +16,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE"], "allow_headers": ["Content-Type", "Authorization"]}})
+
 
 app.config["MONGODB_SETTINGS"] = {"host": os.getenv("MONGODB_URI")}
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")

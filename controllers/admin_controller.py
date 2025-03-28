@@ -33,6 +33,8 @@ def get_all_users():
             {
                 'id': str(user.id),
                 'username': user.username,
+                'full_name': user.full_name,
+                'is_active': user.is_active,
                 'email': user.email,
                 'role': user.role,
                 'created_at': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None,

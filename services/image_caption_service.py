@@ -15,7 +15,12 @@ class ImageCaptionService:
     _model = None
     _processor = None
     _device = "cuda" if torch.cuda.is_available() else "cpu"
-    _model_path = "D:/AIRC/Backend-AIRC-Web/pretrain/blip_trained"
+    # _model_path = "D:/AIRC/AIRC-Backend/pretrain/blip_trained"
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))  # Lấy thư mục hiện tại (services)
+    parent_dir = os.path.abspath(os.path.join(current_dir, ".."))  # Lùi lên một cấp (AIRC-Backend)
+    _model_path = os.path.join(parent_dir, "pretrain", "blip_trained")  # Đường dẫn đến pretrain/blip_trained
+    
     _is_loading = False  # Ngăn chặn các nỗ lực tải đồng thời
 
     @classmethod

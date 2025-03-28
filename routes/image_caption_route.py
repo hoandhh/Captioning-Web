@@ -8,7 +8,7 @@ image_caption_routes = Blueprint('image_caption_routes', __name__)
 image_caption_routes.route('/upload', methods=['POST'])(upload_with_caption)
 
 # Cập nhật caption theo ý người dùng
-image_caption_routes.route('/<image_id>/caption', methods=['PUT'])(update_caption)
+image_caption_routes.route('/caption/<image_id>', methods=['PUT'])(update_caption)
 
 # Tạo lại caption với mô hình
 image_caption_routes.route('/<image_id>/regenerate', methods=['POST'])(regenerate_caption)

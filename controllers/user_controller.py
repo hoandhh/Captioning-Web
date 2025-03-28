@@ -16,7 +16,9 @@ def register():
         user = UserService.create_user(
             username=data['username'],
             password=data['password'],
-            email=data['email']
+            email=data['email'],
+            full_name=data.get('full_name', ''),  # Thêm full_name, mặc định là chuỗi rỗng
+            is_active=data.get('is_active', True)  # Thêm is_active, mặc định là True
         )
         
         return jsonify({'message': 'Đăng ký người dùng thành công'}), 201
@@ -38,6 +40,10 @@ def login():
         user = UserService.authenticate_by_email(data['email'], data['password'])
         if not user:
             return jsonify({'error': 'Thông tin đăng nhập không hợp lệ'}), 401
+        
+        # Kiểm tra trạng thái hoạt động của tài khoản
+        if not user.is_active:
+            return jsonify({'error': 'Tài khoản đã bị vô hiệu hóa'}), 403
         
         # Tạo token truy cập
         access_token = create_access_token(identity=str(user.id))
@@ -63,6 +69,8 @@ def get_profile():
         return jsonify({
             'username': user.username,
             'email': user.email,
+            'full_name': user.full_name,  # Thêm full_name
+            'is_active': user.is_active,  # Thêm is_active
             'role': user.role,
             'created_at': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None,
             'last_login': user.last_login.isoformat() if hasattr(user, 'last_login') and user.last_login else None
