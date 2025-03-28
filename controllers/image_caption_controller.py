@@ -48,12 +48,16 @@ def upload_with_caption():
         # 5. Trả về kết quả
         return jsonify({
             "success": True,
-            "image": {
-                "id": str(image.id),
-                "description": caption,
-                "url": f"/api/images/file/{image.file_path}",
-                "created_at": image.created_at.isoformat() if hasattr(image, 'created_at') else None
-            }
+            # "image": {
+            #     "id": str(image.id),
+            #     "description": caption,
+            #     "url": f"/api/images/file/{image.file_path}",
+            #     "created_at": image.created_at.isoformat() if hasattr(image, 'created_at') else None
+            # }
+            
+            "id": str(image.id),
+            "description": caption
+            
         }), 200
         
     except ValueError as e:

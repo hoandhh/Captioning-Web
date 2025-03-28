@@ -1,5 +1,5 @@
 # controllers/admin_controller.py
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify
 from services.user_service import UserService
 from services.image_service import ImageService
 from flask_jwt_extended import jwt_required, get_jwt_identity
