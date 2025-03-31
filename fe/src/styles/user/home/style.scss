@@ -1,0 +1,12 @@
+.home-page {
+  :where(.css-dev-only-do-not-override-1a3rktk).ant-row {
+    width: 100%;
+  }
+  :where(.css-dev-only-do-not-override-1a3rktk).ant-form-item
+    .ant-form-item-control:first-child:not([class^="'ant-col-'"]):not(
+      [class*="' ant-col-'"]
+    ) {
+    display: flex;
+    justify-content: end;
+  }
+}
