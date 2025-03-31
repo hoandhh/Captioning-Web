@@ -26,7 +26,15 @@ def get_all_users():
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('per_page', 20))
     
-    users = UserService.get_all_users(page, per_page)
+    is_active = request.args.get('is_active')  # "true", "false", hoặc None
+    role = request.args.get('role')           # "admin", "user", hoặc None
+    
+    users = UserService.get_all_users(
+        page=page,
+        per_page=per_page,
+        is_active=is_active,
+        role=role
+    )
     
     return jsonify({
         'users': [
@@ -39,7 +47,8 @@ def get_all_users():
                 'role': user.role,
                 'created_at': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None,
                 'last_login': user.last_login.isoformat() if hasattr(user, 'last_login') and user.last_login else None
-            } for user in users.items
+            }
+            for user in users.items
         ],
         'total': users.total,
         'pages': users.pages,

@@ -59,9 +59,28 @@ class UserService:
         return user
     
     @staticmethod
-    def get_all_users(page=1, per_page=20):
-        """Lấy tất cả người dùng với phân trang (chỉ admin)"""
-        return User.objects.paginate(page=page, per_page=per_page)
+    def get_all_users(page=1, per_page=20, is_active=None, role=None):
+        """Lấy danh sách người dùng với phân trang, cho phép lọc theo is_active và role (chỉ admin)"""
+        query = {}
+        
+        # Nếu is_active không phải None, chuyển về boolean và đưa vào query
+        if is_active is not None:
+            if isinstance(is_active, str):
+                if is_active.lower() == "true":
+                    query['is_active'] = True
+                elif is_active.lower() == "false":
+                    query['is_active'] = False
+            elif isinstance(is_active, bool):
+                query['is_active'] = is_active
+
+        # Nếu role không phải None, thêm vào query
+        if role is not None:
+            query['role'] = role
+            
+        # Lọc và phân trang
+        # User.objects(**query) tương đương với User.objects.filter(**query) trong Django ORM
+        # Ví dụ: User.objects(is_active=True, role="admin")
+        return User.objects(**query).paginate(page=page, per_page=per_page)
     
     @staticmethod
     def delete_user(user_id):
