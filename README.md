@@ -7,11 +7,12 @@ Dự án này là một ứng dụng web cho phép người dùng và quản tr�
 
 ## **Công nghệ sử dụng**
 
-- **Backend (Flask + Python)**  
+- **Backend (Flask + Python + BLIP)**  
   Ứng dụng Flask đảm nhiệm xử lý logic nghiệp vụ, xác thực người dùng, quản trị dữ liệu và điều phối các API.  
   - Flask: Xây dựng API RESTful  
   - MongoDB: Lưu trữ dữ liệu người dùng, hình ảnh, thông tin caption  
   - Python: Ngôn ngữ chính, phù hợp cho xử lý dữ liệu, AI/ML (khi tạo caption)
+  - BLIP (Bootstrapped Language-Image Pretraining): Mô hình AI tạo caption cho hình ảnh dựa trên học sâu, giúp tự động sinh mô tả chính xác và tự nhiên.
 
 - **Frontend (ReactJS + Ant Design + Tailwind CSS)**  
   Giao diện ReactJS cho phép xây dựng cấu trúc component linh hoạt. Ant Design mang đến bộ thành phần UI đẹp, còn Tailwind CSS giúp tùy biến phong cách nhanh chóng.  
@@ -51,7 +52,7 @@ Dự án này là một ứng dụng web cho phép người dùng và quản tr�
 - **Trải nghiệm người dùng**: Giao diện tối ưu, hiện đại nhờ kết hợp giữa Ant Design và Tailwind CSS.  
 - **Mở rộng dễ dàng**: Kiến trúc phân tách frontend-backend, thuận tiện cho việc bổ sung tính năng mới.  
 - **Bảo mật**: Sử dụng các cơ chế xác thực an toàn, bảo vệ dữ liệu nhạy cảm.  
-- **Tích hợp AI**: Tận dụng Python + các thư viện Machine Learning để sinh caption cho hình ảnh giúp nâng cao trải nghiệm.
+- **Tích hợp AI**: Tận dụng Python + các thư viện Machine Learning và mô hình BLIP (Bootstrapping Language-Image Pre-training) để sinh caption cho hình ảnh giúp nâng cao trải nghiệm.
 
 ---
 

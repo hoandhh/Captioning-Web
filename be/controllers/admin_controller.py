@@ -104,6 +104,32 @@ def toggle_user_status(user_id):
     except Exception as e:
         return jsonify({'error': f'Lỗi hệ thống: {str(e)}'}), 500
 
+@jwt_required()
+@admin_required
+def change_user_role(user_id):
+    data = request.get_json()
+    
+    if 'role' not in data:
+        return jsonify({'error': 'Thiếu tham số role'}), 400
+    
+    try:
+        user = UserService.change_user_role(user_id, data['role'])
+        
+        return jsonify({
+            'message': 'Cập nhật vai trò người dùng thành công',
+            'user': {
+                'id': str(user.id),
+                'username': user.username,
+                'role': user.role
+            }
+        }), 200
+    except ValueError as e:
+        # Xử lý trường hợp không tìm thấy user hoặc role không hợp lệ
+        return jsonify({'error': str(e)}), 404
+    
+    except Exception as e:
+        # Bắt các lỗi khác
+        return jsonify({'error': f'Lỗi hệ thống: {str(e)}'}), 500
 
 @jwt_required()
 @admin_required
