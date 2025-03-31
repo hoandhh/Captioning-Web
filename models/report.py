@@ -1,5 +1,5 @@
 # models/report.py
-from database.setup import db
+from database.set_up import db
 import datetime
 
 class Report(db.Document):

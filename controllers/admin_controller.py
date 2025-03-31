@@ -78,6 +78,35 @@ def delete_user(user_id):
 
 @jwt_required()
 @admin_required
+def toggle_user_status(user_id):
+    """Bật/tắt trạng thái hoạt động của người dùng"""
+    data = request.get_json()
+    
+    if 'is_active' not in data:
+        return jsonify({'error': 'Trạng thái hoạt động (is_active) là bắt buộc'}), 400
+    
+    try:
+        user = UserService.toggle_user_status(user_id, data['is_active'])
+        
+        return jsonify({
+            'message': f"Người dùng đã được {'kích hoạt' if user.is_active else 'khóa'} thành công",
+            'user': {
+                'id': str(user.id),
+                'username': user.username,
+                'email': user.email,
+                'full_name': user.full_name,
+                'is_active': user.is_active,
+                'role': user.role
+            }
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': f'Lỗi hệ thống: {str(e)}'}), 500
+
+
+@jwt_required()
+@admin_required
 def get_all_images():
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('per_page', 20))
@@ -167,3 +196,5 @@ def get_stats():
         'images': image_count,
         'pending_reports': pending_reports_count
     }), 200
+
+

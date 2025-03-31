@@ -1,7 +1,7 @@
 # app.py
 from flask import Flask
 from flask_cors import CORS
-from database.setup import initialize_db
+from database.set_up import initialize_db
 from routes.user_route import user_routes
 from routes.image_route import image_routes
 from routes.admin_route import admin_routes

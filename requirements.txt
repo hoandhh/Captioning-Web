@@ -7,3 +7,5 @@ python-dotenv==0.19.1
 MarkupSafe==2.0.1
 git+https://github.com/huggingface/transformers.git@main
 flask_cors
+bcrypt
+faker
