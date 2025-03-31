@@ -1,6 +1,6 @@
 # Giới thiệu về dự án
 
-Dự án này là một ứng dụng web được phát triển bằng Flask, cung cấp các chức năng cho người dùng, quản trị viên và hệ thống sinh caption cho hình ảnh. Dưới đây là những chức năng chính của từng phần trong ứng dụng:
+Dự án này là một ứng dụng web được phát triển bằng Flask tích hợp thêm mô hình BLIP (Bootstrapped Language-Image Pretraining), cung cấp các chức năng cho người dùng, quản trị viên và hệ thống sinh caption cho hình ảnh. Dưới đây là những chức năng chính của từng phần trong ứng dụng:
 
 ## Chức năng của ứng dụng
 
@@ -24,6 +24,8 @@ Dự án này là một ứng dụng web được phát triển bằng Flask, cu
     - `GET /users`: Lấy danh sách tất cả người dùng.
     - `PUT /users/<user_id>`: Cập nhật thông tin người dùng.
     - `DELETE /users/<user_id>`: Xóa người dùng.
+    - `PUT /users/change-status/<user_id>`: Bật/tắt trạng thái hoạt động của người dùng.
+    - `PUT /users/change-role/<user_id>`: Thay đổi vai trò của người dùng.
     - `GET /images`: Lấy danh sách tất cả hình ảnh.
     - `DELETE /images/<image_id>`: Xóa hình ảnh từ hệ thống.
     - `GET /reports`: Lấy danh sách các báo cáo.

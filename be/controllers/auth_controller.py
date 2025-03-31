@@ -54,12 +54,12 @@ def login():
         access_token = create_access_token(identity=str(user.id))
         return jsonify({
             'access_token': access_token,
-            'user': {
-                'id': str(user.id),
-                'username': user.username,
-                'email': user.email,
-                'role': user.role
-            }
+            # 'user': {
+            #     'id': str(user.id),
+            #     'username': user.username,
+            #     'email': user.email,
+            #     'role': user.role
+            # }
         }), 200
         
     except Exception as e:
