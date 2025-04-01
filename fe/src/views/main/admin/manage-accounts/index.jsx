@@ -1,9 +1,16 @@
+import "../../../../styles/admin/manage-account/style.scss";
 import { App, Col, Input, Row, Select, Switch, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { ACCOUNT_LIST, TOGGLE_STATUS } from "../../../../api/constants";
+import {
+  ACCOUNT_LIST,
+  TOGGLE_STATUS,
+  TOGGLE_ROLE,
+  DELETE_ACCOUNT,
+} from "../../../../api/constants";
 import { toDate } from "../../../../utils/dataUtils";
 import useApi from "../../../../hooks/useApi";
+import { DeleteOutlined } from "@ant-design/icons";
 const ManageAccounts = () => {
   const Api = useApi();
   const [users, setUsers] = useState([]);
@@ -11,19 +18,11 @@ const ManageAccounts = () => {
   const [pageSize, setpageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const { message } = App.useApp();
-  const options = [
-    {
-      value: "",
-      label: "Trạng thái",
-    },
-    {
-      value: "active",
-      label: "Trạng thái hoạt động",
-    },
-    {
-      value: "inactive",
-      label: "Trạng thái dừng hoạt động",
-    },
+  const [filterKey, setFilterKey] = useState("");
+  const [filterValue, setFilterValue] = useState("");
+  const roles = [
+    { label: "User", value: "user" },
+    { label: "Admin", value: "admin" },
   ];
   const columns = [
     {
@@ -55,35 +54,78 @@ const ManageAccounts = () => {
       title: "Quyền",
       dataIndex: "role",
       key: "role",
+      filters: [
+        { text: "User", value: "user" },
+        { text: "Admin", value: "admin" },
+      ],
+      filterMultiple: false,
+      onFilter: (value, record) => record.role === value,
+      render: (role, record) => {
+        return (
+          <Select
+            className="w-[60%]"
+            defaultValue={role}
+            options={roles}
+            onChange={(newRole) => handleChangeRole(record.id, newRole)}
+          />
+        );
+      },
     },
     {
       title: "Trạng thái",
       dataIndex: "is_active",
       key: "is_active",
+      filters: [
+        { text: "Hoạt động", value: true },
+        { text: "Dừng hoạt động", value: false },
+      ],
+      filterMultiple: false,
+      onFilter: (value, record) => record.is_active === value,
       render: (isActive, record) => {
         return (
           <Switch
-            defaultChecked
             checked={isActive}
             onChange={(checked) => handleToggleStatus(record.id, checked)}
           />
         );
       },
     },
+    {
+      title: "Hành động",
+      render: (record) => {
+        return (
+          <>
+            <DeleteOutlined
+              onClick={() => handleDelete(record.id)}
+              style={{ color: "red", fontSize: "24px", cursor: "pointer" }}
+            />
+          </>
+        );
+      },
+    },
   ];
+
+  const handleDelete = async (id) => {
+    await Api.Delete(DELETE_ACCOUNT(id));
+    message.success("Xóa thành công!");
+    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+  };
+
+  const handleChangeRole = async (id, role) => {
+    await Api.Put(TOGGLE_ROLE(id), { role: role });
+    message.success("Cập nhật quyền thành công!");
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => (user.id === id ? { ...user, role: role } : user))
+    );
+  };
   const handleToggleStatus = async (id, checked) => {
-    try {
-      console.log("Cập nhật trạng thái:", id, checked); // Kiểm tra id của user
-      await Api.Put(TOGGLE_STATUS(id), { is_active: checked }); // Gửi API
-      message.success("Cập nhật trạng thái thành công!");
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id === id ? { ...user, is_active: checked } : user
-        )
-      );
-    } catch (error) {
-      console.error("Lỗi khi cập nhật trạng thái:", error);
-    }
+    await Api.Put(TOGGLE_STATUS(id), { is_active: checked });
+    message.success("Cập nhật trạng thái thành công!");
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === id ? { ...user, is_active: checked } : user
+      )
+    );
   };
   const data = users.map((user, index) => ({
     key: index + 1,
@@ -99,15 +141,16 @@ const ManageAccounts = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await Api.Get(ACCOUNT_LIST(currentPage, pageSize));
+      const response = await Api.Get(
+        ACCOUNT_LIST(currentPage, pageSize, filterKey, filterValue)
+      );
       setUsers(response.users);
       setCurrentPage(response.page);
       setTotal(response.total);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, pageSize]);
-
+  }, [currentPage, pageSize, filterKey, filterValue]);
   const handleChange = (newPage, newPageSize) => {
     setCurrentPage(newPage);
     setpageSize(newPageSize);
@@ -118,11 +161,8 @@ const ManageAccounts = () => {
         Danh sách tài khoản
       </div>
       <Row className="!mt-[24px]" gutter={16}>
-        <Col span={20}>
+        <Col span={24}>
           <Input addonAfter={<SearchOutlined />} placeholder="" />
-        </Col>
-        <Col span={4}>
-          <Select className="w-full" defaultValue="" options={options} />
         </Col>
       </Row>
       <Table
@@ -133,7 +173,21 @@ const ManageAccounts = () => {
           current: currentPage,
           pageSize: pageSize,
           total: total,
+          showSizeChanger: true,
           onChange: handleChange,
+        }}
+        onChange={(_, filters) => {
+          if (filters.role && filters.role.length > 0) {
+            setFilterKey("role");
+            setFilterValue(filters.role[0]);
+          } else if (filters.is_active && filters.is_active.length > 0) {
+            console.log(filters.is_active[0]);
+            setFilterKey("is_active");
+            setFilterValue(filters.is_active[0]);
+          } else {
+            setFilterKey("");
+            setFilterValue("");
+          }
         }}
       />
     </>
