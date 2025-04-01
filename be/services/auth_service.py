@@ -100,17 +100,17 @@ class AuthService:
     @staticmethod
     def change_password(user_id, current_password, new_password):
         """Thay đổi mật khẩu người dùng"""
-        # Kiểm tra mật khẩu mới có đủ mạnh không
-        is_valid, error = AuthService.validate_password(new_password)
-        if not is_valid:
-            raise ValueError(error)
-        
         user = User.objects(id=user_id).first()
         if not user:
             raise ValueError("Không tìm thấy người dùng")
             
         if not check_password_hash(user.password, current_password):
             raise ValueError("Mật khẩu hiện tại không chính xác")
+        
+        # Kiểm tra mật khẩu mới có đủ mạnh không
+        is_valid, error = AuthService.validate_password(new_password)
+        if not is_valid:
+            raise ValueError("Mật khẩu mới không đủ mạnh")
             
         user.password = generate_password_hash(new_password)
         user.save()
