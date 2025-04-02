@@ -18,8 +18,7 @@ const useApi = () => {
 
   const Exception = (error) => {
     if (error.response.status === 400) {
-      message.error("Có lỗi xảy ra, vui lòng thử lại sau");
-      return { success: false };
+      return error.response;
     }
     if (error.response.status === 401) {
       signOut();

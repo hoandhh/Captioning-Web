@@ -1,4 +1,5 @@
 import "../../../../styles/admin/manage-account/style.scss";
+import { Spin } from "antd";
 import { App, Col, Input, Row, Select, Switch, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -18,8 +19,8 @@ const ManageAccounts = () => {
   const [pageSize, setpageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const { message } = App.useApp();
-  const [filterKey, setFilterKey] = useState("");
-  const [filterValue, setFilterValue] = useState("");
+  const [filters, setFilters] = useState({ role: null, is_active: null });
+  const [loading, setLoading] = useState(false);
   const roles = [
     { label: "User", value: "user" },
     { label: "Admin", value: "admin" },
@@ -63,8 +64,8 @@ const ManageAccounts = () => {
       render: (role, record) => {
         return (
           <Select
-            className="w-[60%]"
-            defaultValue={role}
+            className="w-[100px]"
+            value={role}
             options={roles}
             onChange={(newRole) => handleChangeRole(record.id, newRole)}
           />
@@ -104,7 +105,6 @@ const ManageAccounts = () => {
       },
     },
   ];
-
   const handleDelete = async (id) => {
     await Api.Delete(DELETE_ACCOUNT(id));
     message.success("Xóa thành công!");
@@ -141,17 +141,20 @@ const ManageAccounts = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log(filters);
       const response = await Api.Get(
-        ACCOUNT_LIST(currentPage, pageSize, filterKey, filterValue)
+        ACCOUNT_LIST(currentPage, pageSize, filters)
       );
       setUsers(response.users);
       setCurrentPage(response.page);
       setTotal(response.total);
+      setLoading(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, pageSize, filterKey, filterValue]);
+  }, [currentPage, pageSize, filters]);
   const handleChange = (newPage, newPageSize) => {
+    setLoading(true);
     setCurrentPage(newPage);
     setpageSize(newPageSize);
   };
@@ -165,31 +168,26 @@ const ManageAccounts = () => {
           <Input addonAfter={<SearchOutlined />} placeholder="" />
         </Col>
       </Row>
-      <Table
-        className="!mt-[24px]"
-        columns={columns}
-        dataSource={data}
-        pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: total,
-          showSizeChanger: true,
-          onChange: handleChange,
-        }}
-        onChange={(_, filters) => {
-          if (filters.role && filters.role.length > 0) {
-            setFilterKey("role");
-            setFilterValue(filters.role[0]);
-          } else if (filters.is_active && filters.is_active.length > 0) {
-            console.log(filters.is_active[0]);
-            setFilterKey("is_active");
-            setFilterValue(filters.is_active[0]);
-          } else {
-            setFilterKey("");
-            setFilterValue("");
-          }
-        }}
-      />
+      <Spin spinning={loading} size="large">
+        <Table
+          className="!mt-[24px]"
+          columns={columns}
+          dataSource={data}
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            onChange: handleChange,
+          }}
+          onChange={(_, filters) => {
+            setFilters({
+              role: filters.role?.[0] ?? null,
+              is_active: filters.is_active?.[0] ?? null,
+            });
+          }}
+        />
+      </Spin>
     </>
   );
 };

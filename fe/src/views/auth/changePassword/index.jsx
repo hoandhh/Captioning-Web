@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useApi from "../../../hooks/useApi";
+import { CHANGE_PASSWORD } from "../../../api/constants";
 import { App, Form, Input, Modal } from "antd";
 
 const ChangePassword = ({ open, onClose }) => {
@@ -15,10 +16,15 @@ const ChangePassword = ({ open, onClose }) => {
   };
 
   const handleSubmit = async (values) => {
+    console.log(values);
     setLoading(true);
-    const res = await Api.Get(123123, values);
+    const res = await Api.Post(CHANGE_PASSWORD, values);
     setLoading(false);
-    if (res) {
+    if (res.status === 400) {
+      message.error(res.data.error);
+      handleClose();
+    }
+    if (res.message) {
       message.success("Đổi mật khẩu thành công!");
       handleClose();
     }
@@ -37,7 +43,7 @@ const ChangePassword = ({ open, onClose }) => {
       <Form layout="vertical" form={form} onFinish={handleSubmit}>
         <Form.Item
           label="Mật khẩu cũ"
-          name="oldPassword"
+          name="current_password"
           rules={[
             {
               required: true,
@@ -49,7 +55,7 @@ const ChangePassword = ({ open, onClose }) => {
         </Form.Item>
         <Form.Item
           label="Mật khẩu mới"
-          name="password"
+          name="new_password"
           rules={[
             {
               required: true,
@@ -62,7 +68,7 @@ const ChangePassword = ({ open, onClose }) => {
         <Form.Item
           label="Xác nhận mật khẩu mới"
           name="confirm"
-          dependencies={["password"]}
+          dependencies={["new_password"]}
           rules={[
             {
               required: true,
@@ -70,7 +76,7 @@ const ChangePassword = ({ open, onClose }) => {
             },
             {
               validator: (_, value) => {
-                if (!value || form.getFieldValue("password") === value) {
+                if (!value || form.getFieldValue("new_password") === value) {
                   return Promise.resolve();
                 }
                 return Promise.reject(new Error("Mật khẩu không khớp!"));

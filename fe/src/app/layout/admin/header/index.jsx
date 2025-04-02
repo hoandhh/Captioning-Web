@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Avatar, Dropdown, Typography, Modal, Input } from "antd";
+import { Avatar, Dropdown, Typography } from "antd";
 import { UserOutlined, LockOutlined, LogoutOutlined } from "@ant-design/icons";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
 import ChangePassword from "../../../../views/auth/changePassword";
