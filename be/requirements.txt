@@ -9,3 +9,6 @@ git+https://github.com/huggingface/transformers.git@main
 flask_cors
 bcrypt
 faker
+googletrans==4.0.0-rc1
+gTTs
+playsound==1.2.2

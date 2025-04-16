@@ -3,6 +3,10 @@ import torch
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import os
+from googletrans import Translator
+from gtts import gTTS
+import tempfile
+import playsound  
 
 class ImageCaptionService:
     """
@@ -67,28 +71,21 @@ class ImageCaptionService:
             print("Đã giải phóng mô hình khỏi bộ nhớ")
 
     @classmethod
-    def generate_caption_from_path(cls, image_path, max_length=30, num_beams=5):
+    def generate_caption_from_path(cls, image_path, max_length=30, num_beams=5, speak=False):
         """
-        Tạo caption cho ảnh từ đường dẫn file
+        Tạo caption cho ảnh từ đường dẫn file.
+        Nếu speak=True, sẽ dịch caption sang tiếng Anh và phát tiếng.
         """
         if not os.path.exists(image_path):
             raise ValueError("Không tìm thấy file ảnh")
-            
+
         try:
-            # Đảm bảo model & processor đã được load
             cls._load_model_if_needed()
-
-            # Mở file ảnh với Pillow từ đường dẫn
             image = Image.open(image_path).convert("RGB")
-
-            # Dùng processor để tiền xử lý input
             inputs = cls._processor(image, return_tensors="pt")
-
-            # Đưa input lên GPU (nếu khả dụng)
             for k, v in inputs.items():
                 inputs[k] = v.to(cls._device)
 
-            # Sinh output (caption)
             with torch.no_grad():
                 output_ids = cls._model.generate(
                     **inputs,
@@ -97,19 +94,32 @@ class ImageCaptionService:
                     min_length=5
                 )
 
-            # Decode thành câu
-            caption = cls._processor.decode(output_ids[0], skip_special_tokens=True)
-            return caption
+            caption_vi = cls._processor.decode(output_ids[0], skip_special_tokens=True)
+            print("📸 Caption tiếng Việt:", caption_vi)
 
-        except IOError as e:
-            # Xử lý lỗi khi tải ảnh
-            print(f"Lỗi khi tải ảnh: {e}")
-            raise ValueError("File ảnh không hợp lệ hoặc sai định dạng") from e
-        except RuntimeError as e:
-            # Xử lý lỗi CUDA hết bộ nhớ hoặc các lỗi runtime khác
-            print(f"Lỗi khi chạy mô hình: {e}")
-            raise RuntimeError("Không thể xử lý ảnh với mô hình") from e
+            if speak:
+                translator = Translator()
+                translation = translator.translate(caption_vi, src='en', dest='vi')
+                caption_en = translation.text
+                print("🔁 Dịch sang tiếng Anh:", caption_en)
+
+                # Chuyển văn bản tiếng Anh thành tiếng nói
+                tts = gTTS(caption_en, lang='vi')
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+                    temp_path = fp.name
+                    tts.save(temp_path)
+
+                # Phát âm thanh
+                try:
+                    playsound.playsound(temp_path)
+                except Exception:
+                    os.system(f"start {temp_path}")  # fallback nếu playsound lỗi
+
+                # Xóa file tạm (tuỳ chọn)
+                os.remove(temp_path)
+
+            return caption_vi
+
         except Exception as e:
-            # Bắt tất cả các lỗi không mong đợi
-            print(f"Lỗi không mong đợi trong quá trình tạo chú thích: {e}")
+            print(f"Lỗi khi tạo caption: {e}")
             raise

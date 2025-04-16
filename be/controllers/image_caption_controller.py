@@ -40,7 +40,7 @@ def upload_with_caption():
         image_path = os.path.join(ImageService.UPLOAD_FOLDER, image.file_path)
         
         # 3. Tạo caption
-        caption = ImageCaptionService.generate_caption_from_path(image_path)
+        caption = ImageCaptionService.generate_caption_from_path(image_path, speak=True)
         
         # 4. Cập nhật mô tả của ảnh với caption vừa tạo
         ImageService.update_image(str(image.id), user_id, caption)
