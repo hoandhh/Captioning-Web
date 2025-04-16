@@ -1,6 +1,6 @@
 # Giới thiệu về dự án
 
-Dự án này là một ứng dụng web được phát triển bằng Flask tích hợp thêm mô hình BLIP (Bootstrapped Language-Image Pretraining), cung cấp các chức năng cho người dùng, quản trị viên và hệ thống sinh caption cho hình ảnh. Dưới đây là những chức năng chính của từng phần trong ứng dụng:
+Dự án này là một ứng dụng web được phát triển bằng Flask tích hợp thêm mô hình BLIP (Bootstrapped Language-Image Pretraining) và công nghệ Text2Speech, cung cấp các chức năng cho người dùng, quản trị viên và hệ thống sinh caption cho hình ảnh. Dưới đây là những chức năng chính của từng phần trong ứng dụng:
 
 ## Chức năng của ứng dụng
 
