@@ -40,7 +40,7 @@ Dự án này là một ứng dụng web được phát triển bằng Flask tí
     **Các endpoint**:
     - `POST /upload`: Tải lên hình ảnh và tự động tạo caption.
     - `PUT /caption/<image_id>`: Cập nhật caption cho một hình ảnh đã tồn tại.
-    - `POST /<image_id>/regenerate`: Tạo lại caption cho một hình ảnh.
+    - `POST /<image_id>/regenerate`: Tạo lại caption cho một hình ảnh và chuyển caption đó thành giọng nói.
 
 - **Tính năng cho người dùng**:
     - Lấy thông tin profile người dùng và cập nhật thông tin đó.
@@ -104,7 +104,7 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 - Mở trình duyệt và truy cập `http://localhost:5000` để kiểm tra ứng dụng.
 
 ## Liên hệ và hỗ trợ
-Nếu bạn có câu hỏi hoặc gặp vấn đề khi sử dụng AIRC, vui lòng:
+Nếu bạn có câu hỏi hoặc gặp vấn đề khi sử dụng, vui lòng:
 
 Liên hệ qua email: hoandoan288@gmail.com
 © 2025 Hoan Doan
