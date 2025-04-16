@@ -1,7 +1,7 @@
 # Image Captioning Web
 
 **Giới thiệu tổng quan**  
-Dự án này là một ứng dụng web cho phép người dùng và quản trị viên quản lý thông tin tài khoản, cargar nhịp hình ảnh, đồng thời tự động sinh caption cho ảnh. Phía máy chủ (Backend) sử dụng Python Flask kết nối với cơ sở dữ liệu MongoDB, còn giao diện (Frontend) được phát triển trên ReactJS, tích hợp Ant Design và Tailwind CSS để xây dựng trải nghiệm tối ưu cho người dùng.
+Dự án này là một ứng dụng web được phát triển bằng Flask tích hợp thêm mô hình BLIP (Bootstrapped Language-Image Pretraining) và công nghệ Text2Speech, cung cấp các chức năng cho người dùng, quản trị viên và hệ thống sinh caption cho hình ảnh. Phía máy chủ (Backend) sử dụng Python Flask kết nối với cơ sở dữ liệu MongoDB, còn giao diện (Frontend) được phát triển trên ReactJS, tích hợp Ant Design và Tailwind CSS để xây dựng trải nghiệm tối ưu cho người dùng.
 
 ---
 
