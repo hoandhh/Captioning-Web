@@ -2,6 +2,7 @@ import { Menu } from "antd";
 import { Link } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
 import { TbBrandAirtable } from "react-icons/tb";
+import "../../../../styles/user/sider/style.scss";
 const items = [
   {
     key: "1",
@@ -27,10 +28,11 @@ const Sider = ({ setHeaderInfo }) => {
     }
   };
   return (
-    <div className="h-screen min-h-screen bg-white">
-      <div className="h-[calc(100vh_-_150px)] overflow-y-auto mt-[16px]">
+    <div className="my-sider h-screen min-h-screen bg-white">
+      <div className="my-sider-content h-[calc(100vh_-_150px)] overflow-y-auto mt-[16px]">
         <Menu
           mode="inline"
+          defaultSelectedKeys={["1"]}
           onClick={handleClick}
           items={items.map((item) => ({
             key: item.key,

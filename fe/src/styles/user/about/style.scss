@@ -1,0 +1,11 @@
+.about::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("../../../assets/images/hoavan.jpg");
+  background-repeat: repeat;
+  background-size: 350px;
+  opacity: 0.1; /* Mức độ mờ vừa đủ để không gây rối */
+  pointer-events: none;
+  z-index: 0;
+}

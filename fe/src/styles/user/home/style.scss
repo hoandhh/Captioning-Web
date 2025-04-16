@@ -1,12 +1,26 @@
-.home-page {
-  :where(.css-dev-only-do-not-override-1a3rktk).ant-row {
-    width: 100%;
-  }
-  :where(.css-dev-only-do-not-override-1a3rktk).ant-form-item
-    .ant-form-item-control:first-child:not([class^="'ant-col-'"]):not(
-      [class*="' ant-col-'"]
-    ) {
-    display: flex;
-    justify-content: end;
+// .homeClient {
+//   background-size: cover;
+//   background-repeat: no-repeat;
+//   background-attachment: fixed;
+//   background-position: center;
+//   position: relative;
+// }
+
+.homeClient::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("../../../assets/images/hoavan.jpg");
+  background-repeat: repeat;
+  background-size: 350px;
+  opacity: 0.05; /* Mức độ mờ vừa đủ để không gây rối */
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media screen and (max-width: 400px) {
+  .responsive-buttons2,
+  .responsive-buttons1 {
+    justify-content: center;
   }
 }

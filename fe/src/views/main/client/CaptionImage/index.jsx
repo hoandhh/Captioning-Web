@@ -18,7 +18,7 @@ const CaptionImage = () => {
   const [preEditedCaption, setPreEditedCaption] = useState();
   const [idImage, setIdImage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // New loading state
+  const [isLoading, setIsLoading] = useState(false);
   const Api = useApi();
 
   const handleUpload = (info) => {
@@ -40,7 +40,7 @@ const CaptionImage = () => {
       return;
     }
 
-    setIsLoading(true); // Set loading state to true before API call
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -52,9 +52,8 @@ const CaptionImage = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Error uploading image:", error);
-      // You could add error handling here, like showing an error message
     } finally {
-      setIsLoading(false); // Set loading state to false after API call completes
+      setIsLoading(false);
     }
   };
 
@@ -72,15 +71,13 @@ const CaptionImage = () => {
   };
 
   const handleSave = async () => {
-    setIsLoading(true); // Set loading state for save operation
-
+    setIsLoading(true);
     try {
       const data = { description: caption };
       await Api.Put(SAVE_CAPTION_IMAGE(idImage), data);
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving caption:", error);
-      // You could add error handling here
     } finally {
       setIsLoading(false);
     }
@@ -89,35 +86,72 @@ const CaptionImage = () => {
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   return (
-    <>
+    <div className="h-screen !p-4 lg:p-6">
       <Form
         onFinish={handleSubmit}
-        className="bg-white !ml-[30px] !mr-[30px] home-page h-[50%] !mt-[24px] shadow-md rounded-lg !p-6 flex flex-col justify-between"
+        className="bg-white shadow-md rounded-lg !p-4 lg:p-6 flex flex-col gap-6"
       >
-        {/* Preview Section */}
-        <div className="flex flex-5 gap-4">
-          <div className="flex-3 flex items-center justify-center bg-gray-100 p-4 text-center rounded-md min-h-[80px]">
-            {previewUrl ? (
-              <Image
-                src={previewUrl}
-                alt="Uploaded"
-                className="max-w-full max-h-[250px] rounded-md mx-auto"
-              />
-            ) : (
-              "No image uploaded (chỉ hỗ trợ .jpeg, .png)"
-            )}
+        {/* Top Section: Uploads + Button + Caption */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Left: Upload + Remove */}
+          <div className="w-full lg:w-1/3 flex flex-col gap-2">
+            {/* Upload & Remove Buttons */}
+            <div className="flex gap-2 flex-wrap responsive-buttons1">
+              <Upload
+                beforeUpload={() => false}
+                onChange={handleUpload}
+                showUploadList={false}
+                disabled={isLoading}
+              >
+                <Button
+                  type="button"
+                  className="bg-green-600 text-white !px-4 !py-2 rounded-md flex items-center gap-2 hover:bg-green-700 disabled:opacity-50"
+                  disabled={isLoading}
+                >
+                  <PictureOutlined />
+                  Choose Image
+                </Button>
+              </Upload>
+
+              <Button
+                type="button"
+                className="bg-red-500 text-white !px-4 !py-2 rounded-md flex items-center gap-2 hover:bg-red-600 disabled:opacity-50"
+                disabled={!file || isLoading}
+                onClick={handleRemove}
+              >
+                <DeleteOutlined />
+                Remove
+              </Button>
+            </div>
+
+            {/* Image Preview */}
+            <div className="bg-gray-100 text-center rounded-md min-h-[120px] flex items-center justify-center p-2">
+              {previewUrl ? (
+                <Image
+                  src={previewUrl}
+                  alt="Uploaded"
+                  className="max-w-full max-h-[250px] rounded-md"
+                />
+              ) : (
+                "No image uploaded (chỉ hỗ trợ .jpeg, .png)"
+              )}
+            </div>
           </div>
-          <div className="flex-1 flex items-center">
+
+          {/* Middle: Submit Button */}
+          <div className="w-full lg:w-1/6 flex items-center">
             <Button
               htmlType="submit"
-              className="bg-purple-500 w-full text-white px-4 py-2 rounded-md flex items-center justify-center gap-2 hover:bg-purple-600 disabled:opacity-50"
+              className="bg-purple-500 w-full text-white !px-4 !py-2 rounded-md flex items-center justify-center gap-2 hover:bg-purple-600 disabled:opacity-50"
               disabled={!file || isLoading}
             >
               {isLoading ? <Spin indicator={antIcon} /> : <VscGithubAction />}
               {isLoading ? "Đang xử lý..." : "Thực hiện caption"}
             </Button>
           </div>
-          <div className="flex-3  bg-gray-100 p-4 text-center rounded-md min-h-[80px]">
+
+          {/* Right: Caption Input */}
+          <div className="w-full lg:w-1/2 bg-gray-100 !p-4 text-center rounded-md min-h-[80px] flex items-center">
             <Input
               disabled={!isEditing}
               className="h-full text-center !text-[#4c4848]"
@@ -128,72 +162,42 @@ const CaptionImage = () => {
           </div>
         </div>
 
-        {/* Buttons Section */}
-        <Form.Item className="flex flex-1 !mb-0">
-          <div className="flex justify-between gap-3">
-            <div className="flex items-end">
-              <Form.Item className="!w-full !mb-0">
-                <Upload
-                  beforeUpload={() => false}
-                  onChange={handleUpload}
-                  showUploadList={false}
-                  disabled={isLoading}
-                >
-                  <Button
-                    type="button"
-                    className="bg-green-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-green-700 disabled:opacity-50"
-                    disabled={isLoading}
-                  >
-                    <PictureOutlined />
-                    Choose Image
-                  </Button>
-                </Upload>
-              </Form.Item>
-              <Button
-                type="button"
-                className="bg-red-500 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-red-600 disabled:opacity-50"
-                disabled={!file || isLoading}
-                onClick={handleRemove}
-              >
-                <DeleteOutlined />
-                Remove
-              </Button>
-            </div>
-            <div className="flex">
-              <Button
-                type="button"
-                className="bg-yellow-500 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-yellow-600 disabled:opacity-50"
-                disabled={!file || !caption || isLoading}
-                onClick={handleEdit}
-              >
-                ✏️ Edit
-              </Button>
-              <Button
-                type="button"
-                className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-600 disabled:opacity-50"
-                disabled={!isEditing || isLoading}
-                onClick={handleSave}
-              >
-                {isLoading && isEditing ? (
-                  <Spin indicator={antIcon} size="small" />
-                ) : (
-                  "💾"
-                )}{" "}
-                Save
-              </Button>
-              <Button
-                type="button"
-                className="bg-gray-500 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-gray-600 disabled:opacity-50"
-                disabled={!isEditing || isLoading}
-                onClick={handleCancel}
-              >
-                ❌ Cancel
-              </Button>
-            </div>
+        {/* Bottom: Edit/Save/Cancel */}
+        <Form.Item className="!mb-0">
+          <div className="flex flex-wrap gap-2 justify-end responsive-buttons2">
+            <Button
+              type="button"
+              className="bg-yellow-500 text-white !px-4 !py-2 rounded-md flex items-center gap-2 hover:bg-yellow-600 disabled:opacity-50"
+              disabled={!file || !caption || isLoading}
+              onClick={handleEdit}
+            >
+              ✏️ Edit
+            </Button>
+            <Button
+              type="button"
+              className="bg-blue-500 text-white !px-4 !py-2 rounded-md flex items-center gap-2 hover:bg-blue-600 disabled:opacity-50"
+              disabled={!isEditing || isLoading}
+              onClick={handleSave}
+            >
+              {isLoading && isEditing ? (
+                <Spin indicator={antIcon} size="small" />
+              ) : (
+                "💾"
+              )}
+              Save
+            </Button>
+            <Button
+              type="button"
+              className="bg-gray-500 text-white !px-4 !py-2 rounded-md flex items-center gap-2 hover:bg-gray-600 disabled:opacity-50"
+              disabled={!isEditing || isLoading}
+              onClick={handleCancel}
+            >
+              ❌ Cancel
+            </Button>
           </div>
         </Form.Item>
       </Form>
-    </>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 const Footer = () => {
-  return <div className="text-center">Copyright 2025 © Tempo</div>;
+  return <div className="text-center text-white">Copyright 2025 © Tempo</div>;
 };
 
 export default Footer;
