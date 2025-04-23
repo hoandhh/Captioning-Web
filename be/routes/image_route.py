@@ -8,7 +8,7 @@ from controllers.image_controller import (
 image_routes = Blueprint('image_routes', __name__)
 
 image_routes.route('/', methods=['POST'])(upload_image)
-image_routes.route('/file/<filename>', methods=['GET'])(get_image)
+image_routes.route('/file/<image_id>', methods=['GET'])(get_image)
 image_routes.route('/', methods=['GET'])(get_all_images)
 image_routes.route('/my-images', methods=['GET'])(get_user_images)
 image_routes.route('/<image_id>/description', methods=['PUT'])(update_image_description)

@@ -52,6 +52,20 @@ Dự án này là một ứng dụng web được phát triển bằng Flask tí
     - `GET /<user_id>`: Lấy thông tin của người dùng theo ID.
     - `GET /search`: Tìm kiếm người dùng.
 
+- **Tính năng quản lý hình ảnh**:
+    - Tải lên, xem, cập nhật và xóa hình ảnh.
+    - Báo cáo hình ảnh không phù hợp.
+
+    **Các endpoint**:
+    - `POST /api/images/`: Tải lên hình ảnh mới.
+    - `GET /api/images/`: Lấy danh sách tất cả hình ảnh.
+    - `GET /api/images/file/<image_id>`: Lấy dữ liệu hình ảnh từ MongoDB.
+    - `GET /api/images/user`: Lấy danh sách hình ảnh của người dùng hiện tại.
+    - `PUT /api/images/<image_id>/description`: Cập nhật mô tả hình ảnh.
+    - `DELETE /api/images/<image_id>`: Xóa hình ảnh.
+    - `POST /api/images/<image_id>/report`: Báo cáo hình ảnh không phù hợp.
+
+
 # Hướng dẫn cài đặt môi trường và thiết lập
 
 ## Yêu cầu hệ thống

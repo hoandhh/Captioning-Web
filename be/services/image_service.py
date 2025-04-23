@@ -51,16 +51,40 @@ class ImageService:
     @staticmethod
     def get_image_data(image_id):
         """Lấy dữ liệu nhị phân của hình ảnh để hiển thị"""
-        image = Image.objects(id=image_id).first()
-        if not image:
-            return None
-        
-        return send_file(
-            io.BytesIO(image.image_data),
-            mimetype=image.content_type,
-            as_attachment=False,
-            download_name=image.file_name
-        )
+        try:
+            from bson.objectid import ObjectId
+            
+            # Chuyển đổi image_id thành ObjectId
+            obj_id = ObjectId(image_id)
+            image = Image.objects(id=obj_id).first()
+            
+            if not image:
+                from flask import abort
+                return abort(404, description="Không tìm thấy ảnh")
+            
+            if not hasattr(image, 'image_data') or not image.image_data:
+                from flask import abort
+                return abort(404, description="Không có dữ liệu ảnh")
+            
+            # Xác định MIME type
+            mimetype = image.content_type if hasattr(image, 'content_type') and image.content_type else 'image/jpeg'
+            
+            # Sử dụng các tham số cơ bản mà tất cả các phiên bản Flask đều hỗ trợ
+            return send_file(
+                io.BytesIO(image.image_data),
+                mimetype=mimetype,
+                as_attachment=False
+            )
+        except Exception as e:
+            # Log lỗi
+            import traceback
+            print(f"Lỗi khi lấy dữ liệu ảnh: {e}")
+            print(traceback.format_exc())
+            
+            # Trả về lỗi 500
+            from flask import abort
+            return abort(500, description=f"Lỗi server: {str(e)}")
+
     
     @staticmethod
     def update_image(image_id, user_id, description):
