@@ -2,32 +2,30 @@
 from models.image import Image
 from models.report import Report
 from models.user import User
-import os
 import uuid
 from werkzeug.utils import secure_filename
+import io
+from flask import send_file
 
 class ImageService:
-    UPLOAD_FOLDER = 'uploads/images'
     
     @staticmethod
     def upload_image(file, description, user_id):
-        """Tải lên hình ảnh mới"""
-        # Đảm bảo thư mục tải lên tồn tại
-        os.makedirs(ImageService.UPLOAD_FOLDER, exist_ok=True)
-        
+        """Tải lên hình ảnh mới vào MongoDB"""
         # Tạo tên tệp duy nhất
         filename = secure_filename(file.filename)
         unique_filename = f"{uuid.uuid4()}_{filename}"
-        file_path = os.path.join(ImageService.UPLOAD_FOLDER, unique_filename)
         
-        # Lưu tệp
-        file.save(file_path)
+        # Đọc dữ liệu nhị phân từ file
+        file_data = file.read()
         
         # Tạo bản ghi hình ảnh
         user = User.objects(id=user_id).first()
         image = Image(
             description=description,
-            file_path=unique_filename,
+            file_name=unique_filename,
+            content_type=file.content_type,
+            image_data=file_data,
             uploaded_by=user
         )
         image.save()
@@ -49,6 +47,20 @@ class ImageService:
     def get_image_by_id(image_id):
         """Lấy hình ảnh theo ID"""
         return Image.objects(id=image_id).first()
+    
+    @staticmethod
+    def get_image_data(image_id):
+        """Lấy dữ liệu nhị phân của hình ảnh để hiển thị"""
+        image = Image.objects(id=image_id).first()
+        if not image:
+            return None
+        
+        return send_file(
+            io.BytesIO(image.image_data),
+            mimetype=image.content_type,
+            as_attachment=False,
+            download_name=image.file_name
+        )
     
     @staticmethod
     def update_image(image_id, user_id, description):
@@ -81,13 +93,7 @@ class ImageService:
         if str(image.uploaded_by.id) != user_id and user.role != 'admin':
             return False
         
-        # Xóa tệp vật lý
-        try:
-            os.remove(os.path.join(ImageService.UPLOAD_FOLDER, image.file_path))
-        except:
-            pass  # Tệp có thể không tồn tại
-        
-        # Xóa bản ghi hình ảnh
+        # Xóa bản ghi hình ảnh (dữ liệu nhị phân cũng sẽ bị xóa)
         image.delete()
         
         return True
@@ -99,12 +105,6 @@ class ImageService:
         
         if not image:
             return False
-        
-        # Xóa tệp vật lý
-        try:
-            os.remove(os.path.join(ImageService.UPLOAD_FOLDER, image.file_path))
-        except:
-            pass  # Tệp có thể không tồn tại
         
         # Xóa bản ghi hình ảnh
         image.delete()
@@ -165,4 +165,3 @@ class ImageService:
         report.save()
         
         return True
-

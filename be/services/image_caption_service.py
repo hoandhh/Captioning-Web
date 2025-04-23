@@ -7,6 +7,7 @@ from googletrans import Translator
 from gtts import gTTS
 import tempfile
 import playsound
+import io
 
 class ImageCaptionService:
     """
@@ -87,18 +88,16 @@ class ImageCaptionService:
             print(f"⚠️ Lỗi khi đọc caption: {e}")
 
     @classmethod
-    def generate_caption_from_path(cls, image_path, max_length=30, num_beams=5, speak=False):
+    def generate_caption_from_binary(cls, image_data, max_length=30, num_beams=5, speak=False):
         """
-        Tạo caption cho ảnh từ đường dẫn file.
+        Tạo caption cho ảnh từ dữ liệu nhị phân.
         Nếu speak=True, sẽ dịch caption sang tiếng Việt và phát tiếng.
         """
-        if not os.path.exists(image_path):
-            raise ValueError("Không tìm thấy file ảnh")
-
         try:
             cls._load_model_if_needed()
 
-            image = Image.open(image_path).convert("RGB")
+            # Chuyển dữ liệu nhị phân thành đối tượng PIL Image
+            image = Image.open(io.BytesIO(image_data)).convert("RGB")
             inputs = cls._processor(image, return_tensors="pt")
             for k, v in inputs.items():
                 inputs[k] = v.to(cls._device)
@@ -122,3 +121,16 @@ class ImageCaptionService:
         except Exception as e:
             print(f"Lỗi khi tạo caption: {e}")
             raise
+            
+    @classmethod
+    def generate_caption_from_image_id(cls, image_id, max_length=30, num_beams=5, speak=False):
+        """
+        Tạo caption cho ảnh từ ID của ảnh trong MongoDB.
+        """
+        from models.image import Image
+        
+        image_doc = Image.objects(id=image_id).first()
+        if not image_doc:
+            raise ValueError("Không tìm thấy ảnh với ID cung cấp")
+            
+        return cls.generate_caption_from_binary(image_doc.image_data, max_length, num_beams, speak)

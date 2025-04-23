@@ -1,10 +1,10 @@
 # controllers/image_controller.py
-from flask import request, jsonify, send_from_directory
+from flask import request, jsonify, Response
 from services.image_service import ImageService
 from models.user import User
 from models.report import Report
 from flask_jwt_extended import jwt_required, get_jwt_identity
-import os
+import io
 
 @jwt_required()
 def upload_image():
@@ -27,15 +27,16 @@ def upload_image():
             return jsonify({
                 'id': str(image.id),
                 'description': image.description,
-                'url': f"/api/images/file/{image.file_path}"
+                'url': f"/api/images/file/{str(image.id)}"
             }), 201
         except Exception as e:
             return jsonify({'error': str(e)}), 500
     
     return jsonify({'error': 'Loại tệp không được phép'}), 400
 
-def get_image(filename):
-    return send_from_directory(ImageService.UPLOAD_FOLDER, filename)
+def get_image(image_id):
+    """Trả về dữ liệu nhị phân của ảnh từ MongoDB"""
+    return ImageService.get_image_data(image_id)
 
 def get_all_images():
     page = int(request.args.get('page', 1))
@@ -48,7 +49,7 @@ def get_all_images():
             {
                 'id': str(img.id),
                 'description': img.description,
-                'url': f"/api/images/file/{img.file_path}",
+                'url': f"/api/images/file/{str(img.id)}",
                 'created_at': img.created_at.isoformat() if hasattr(img, 'created_at') else None
             } for img in images.items
         ],
@@ -70,7 +71,7 @@ def get_user_images():
             {
                 'id': str(img.id),
                 'description': img.description,
-                'url': f"/api/images/file/{img.file_path}",
+                'url': f"/api/images/file/{str(img.id)}",
                 'created_at': img.created_at.isoformat() if hasattr(img, 'created_at') else None
             } for img in images.items
         ],
@@ -155,7 +156,7 @@ def get_reports():
                 {
                     'id': str(report.id),
                     'image_id': str(report.image.id),
-                    'image_url': f"/api/images/file/{report.image.file_path}",
+                    'image_url': f"/api/images/file/{str(report.image.id)}",
                     'reported_by': str(report.reported_by.id),
                     'reporter_name': f"{report.reported_by.first_name} {report.reported_by.last_name}" if hasattr(report.reported_by, 'first_name') else report.reported_by.username,
                     'reason': report.reason,

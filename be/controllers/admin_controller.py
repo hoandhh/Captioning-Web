@@ -153,7 +153,7 @@ def get_all_images():
             {
                 'id': str(img.id),
                 'description': img.description,
-                'url': f"/api/images/file/{img.file_path}",
+                'url': f"/api/images/file/{str(img.id)}",  # Sửa để sử dụng ID thay vì file_path
                 'created_at': img.created_at.isoformat() if hasattr(img, 'created_at') and img.created_at else None,
                 'uploaded_by': str(img.uploaded_by.id) if img.uploaded_by else None
             } for img in images.items
@@ -186,7 +186,7 @@ def get_reports():
             {
                 'id': str(report.id),
                 'image_id': str(report.image.id),
-                'image_url': f"/api/images/file/{report.image.file_path}",
+                'image_url': f"/api/images/file/{str(report.image.id)}",  # Sửa để sử dụng ID thay vì file_path
                 'image_description': report.image.description,
                 'reported_by': str(report.reported_by.id),
                 'reporter_username': report.reported_by.username if hasattr(report.reported_by, 'username') else "Unknown",
@@ -231,5 +231,3 @@ def get_stats():
         'images': image_count,
         'pending_reports': pending_reports_count
     }), 200
-
-

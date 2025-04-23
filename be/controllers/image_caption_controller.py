@@ -2,14 +2,13 @@
 from flask import request, jsonify
 from services.image_service import ImageService
 from services.image_caption_service import ImageCaptionService
-import os
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 @jwt_required()
 def upload_with_caption():
     """
     API để tải lên ảnh và tự động tạo caption
-    - Lưu ảnh vào hệ thống
+    - Lưu ảnh vào MongoDB
     - Tạo caption tự động và lưu vào trường description
     """
     try:
@@ -29,35 +28,24 @@ def upload_with_caption():
         if not allowed_file(image_file.filename):
             return jsonify({"error": "Định dạng file không được hỗ trợ"}), 400
         
-        # 1. Upload ảnh vào hệ thống (không có mô tả ban đầu)
+        # 1. Upload ảnh vào MongoDB (không có mô tả ban đầu)
         image = ImageService.upload_image(
             file=image_file,
             description="",  # Mô tả trống, sẽ được cập nhật sau
             user_id=user_id
         )
         
-        # 2. Tạo đường dẫn đầy đủ đến file ảnh
-        image_path = os.path.join(ImageService.UPLOAD_FOLDER, image.file_path)
+        # 2. Tạo caption từ dữ liệu nhị phân
+        caption = ImageCaptionService.generate_caption_from_binary(image.image_data, speak=True)
         
-        # 3. Tạo caption
-        caption = ImageCaptionService.generate_caption_from_path(image_path, speak=True)
-        
-        # 4. Cập nhật mô tả của ảnh với caption vừa tạo
+        # 3. Cập nhật mô tả của ảnh với caption vừa tạo
         ImageService.update_image(str(image.id), user_id, caption)
         
-        # 5. Trả về kết quả
+        # 4. Trả về kết quả
         return jsonify({
             "success": True,
-            # "image": {
-            #     "id": str(image.id),
-            #     "description": caption,
-            #     "url": f"/api/images/file/{image.file_path}",
-            #     "created_at": image.created_at.isoformat() if hasattr(image, 'created_at') else None
-            # }
-            
             "id": str(image.id),
             "description": caption
-            
         }), 200
         
     except ValueError as e:
@@ -95,7 +83,7 @@ def update_caption(image_id):
             "image": {
                 "id": str(image.id),
                 "description": image.description,
-                "url": f"/api/images/file/{image.file_path}",
+                "url": f"/api/images/file/{str(image.id)}",
                 "created_at": image.created_at.isoformat() if hasattr(image, 'created_at') else None
             }
         }), 200
@@ -123,15 +111,8 @@ def regenerate_caption(image_id):
         if str(image.uploaded_by.id) != user_id and not hasattr(image.uploaded_by, 'role') or image.uploaded_by.role != 'admin':
             return jsonify({"error": "Không có quyền truy cập ảnh này"}), 403
             
-        # Tạo đường dẫn đầy đủ đến file ảnh
-        image_path = os.path.join(ImageService.UPLOAD_FOLDER, image.file_path)
-        
-        # Kiểm tra file có tồn tại không
-        if not os.path.exists(image_path):
-            return jsonify({"error": "File ảnh không tồn tại trên server"}), 404
-            
-        # Tạo caption mới
-        caption = ImageCaptionService.generate_caption_from_path(image_path)
+        # Tạo caption mới từ dữ liệu nhị phân trong MongoDB
+        caption = ImageCaptionService.generate_caption_from_binary(image.image_data)
         
         # Cập nhật mô tả với caption mới
         ImageService.update_image(image_id, user_id, caption)
@@ -142,7 +123,7 @@ def regenerate_caption(image_id):
             "image": {
                 "id": str(image.id),
                 "description": caption,
-                "url": f"/api/images/file/{image.file_path}",
+                "url": f"/api/images/file/{str(image.id)}",
                 "created_at": image.created_at.isoformat() if hasattr(image, 'created_at') else None
             }
         }), 200
